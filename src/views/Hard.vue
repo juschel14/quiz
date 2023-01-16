@@ -135,7 +135,6 @@ import {  useQuizStore } from '../stores'
       
   }
   const closeRow = () => {
-    console.log('close role')  
     crr.value = ''
     answer.value = null
     checked.value = false
@@ -153,10 +152,8 @@ import {  useQuizStore } from '../stores'
 
   const chunkQuestions = () => {
     const raw = JSON.parse(JSON.stringify(raw_questions.value))
-    console.log('watch raw q',raw_questions,raw)
     const chunks = Array.from({ length: Math.ceil(raw_questions.value.length / pagination.value.rowsPerPage) })
       .map(() => raw.splice(0, pagination.value.rowsPerPage));
-      console.log('chunks',chunks)
       questions = chunks//[pagination.value.page]
       pagination.value.rowsNumber =  raw_questions.value.length
   }

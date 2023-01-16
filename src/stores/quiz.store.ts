@@ -10,10 +10,17 @@ interface Response {
     response_code: number,
     results: Question[]
 }
+interface TokenResponse {
+    response_code: number,
+    token: Token
+}
+interface Token {
+    token: null | string
+}
 
 interface QuizState {
     error: null | string,
-    token: null | string,
+    token: null | Token,
     easy_questions: [] | Question[],
     medium_questions: [] | Question[],
     hard_questions: [] | Question[],
@@ -41,21 +48,20 @@ export const useQuizStore = defineStore({
         },
         async getToken() {
             try {
-                const oke = await fetchWrapper.get(token_URL,null)
+                const oke: TokenResponse = await fetchWrapper.fetchData(token_URL)
                 if(oke.response_code === 0) {
                     this.$state.token = oke.token
                 }
-                console.log('token?',token_URL,oke)
             } catch (error) {
                 console.log('token? error',error)
             }
         },
-        shuffleArray(array) {
+        shuffleArray(array: any) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [array[i], array[j]] = [array[j], array[i]];
             }
-            let options = []
+            let options = [] as any []
             array.forEach((string: string) => {
                 let option = {label: string, value: string}
                 options.push(option)
@@ -64,17 +70,16 @@ export const useQuizStore = defineStore({
         },
         sanitize(encoded: Question[]) {
             let ret =  [] as Question[]
-            encoded.forEach( (obj: Question) => {//console.log('json',JSON.stringify(obj))
+            encoded.forEach( (obj: Question) => {
                 try {
                     let cleaned = JSON.parse(decodeURIComponent(JSON.stringify(obj).replaceAll('%22','%47')))
-                    let incorrect = cleaned.incorrect_answers.slice()
-                   // console.log('incorrect_answers',incorrect)
+                    let incorrect = cleaned.incorrect_answers.slice()                   
                     incorrect.push(cleaned.correct_answer)
                     cleaned['all_answers'] = this.shuffleArray(incorrect)
                     cleaned['key'] = cleaned.question
                     ret.push(cleaned)
                 } catch(error) {
-                    console.error('error',error,obj)
+                    console.error(error)
                 }                
             })
             return ret
@@ -83,7 +88,7 @@ export const useQuizStore = defineStore({
             try {               
                 this.$state.selected_difficulty = difficulty
                 const tok = '&token=' + this.$state.token
-                const response: Response = await fetchWrapper.get(query + difficulty + tok,null)
+                const response: Response = await fetchWrapper.fetchData(query + difficulty + tok)
                 
                 if(response.response_code === 0) {
                     const sanitized: Question[]  = await this.sanitize(response.results)
@@ -124,5 +129,8 @@ export const useQuizStore = defineStore({
                 this.$state.error = JSON.stringify(error)
             }
         },
+        deleteToken() {
+            this.$state.token = null
+        }
     }
 });

@@ -25,27 +25,33 @@
         <QBtn label="Reset" type="reset" color="primary" flat class="Qml-sm"></QBtn>
       </div>
     </QForm>
+    <div v-if="errMsg" style="font-size: 16px; color: red;">
+        {{errMsg}}
+    </div>
 
   </div>
 </div>
 </template>
 <script setup lang="ts">
   import { ref } from 'vue'
-  import { useRouter } from 'vue-router' // import router
+  import { useRouter } from 'vue-router' 
   import { useAuthStore } from '../stores';
   const email = ref('')
   const password = ref('')
-  const errMsg = ref() // ERROR MESSAGE
-  const router = useRouter() // get a reference to our vue router
+  const errMsg = ref('') 
+  const router = useRouter() 
   const authStore = useAuthStore()  
-  const submit = async () => { console.log('submit',email.value , password.value)
-   // if(email.value && password.value) {
+  const submit = async () => {
       await authStore.login(email.value, password.value)
-
-    //}
+      if(authStore.$state.error) {
+        errMsg.value = authStore.$state.error
+      } else {
+        router.push('/')
+      }
   }
   const reset = () => {
     email.value = ''
     password.value = ''
+    authStore.resetError()
   }
 </script>

@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from 'firebase/auth'
 import { fetchWrapper } from '../helpers';
 import  router  from '../router';
+import { useQuizStore } from '../stores';
 
 import { initializeApp } from "firebase/app";
 
@@ -35,13 +36,7 @@ export const useAuthStore = defineStore({
         }
      
     },
-    actions: {
-        init() {
-            
-            onAuthStateChanged(auth, (user) => {
-                console.log('onAuthStateChanged',auth,user)
-            })
-        },
+    actions: {       
         resetError() {
             this.$state.error = ''
         },
@@ -49,12 +44,10 @@ export const useAuthStore = defineStore({
             try {
                 const user = await signInAnonymously(auth)
                 if(user) {
-                    console.log('login user',user.user.getIdToken)
                     this.$state.user = user
                     this.$state.token = await user.user.getIdToken(false)
-                    router.push('/easy')
                 } else {
-                    router.push
+                    router.push('/login')
                 }
 
             } catch (error) {
@@ -63,7 +56,10 @@ export const useAuthStore = defineStore({
         },
         async logout() {
             await signOut(auth)
+            const quizStore = useQuizStore()
             this.$state.user = {}
+            this.$state.token = ''
+            quizStore.deleteToken()
             router.push('/login')
         },
         async register() {

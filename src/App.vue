@@ -88,4 +88,8 @@
 .nav-btn {
     min-width: 90px;
 }
+
+.auth-tabs {
+    display: inline-flex;
+}
 </style>
