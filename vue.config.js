@@ -1,7 +1,7 @@
 module.exports = {
   pluginOptions: {
     quasar: {
-      importStrategy: 'kebab',
+      importStrategy: 'combined',
       rtlSupport: false
     }
   },

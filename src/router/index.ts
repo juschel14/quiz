@@ -3,7 +3,7 @@ import Login from '../views/Login.vue'
 import Easy from '../views/Easy.vue'
 import Medium from '../views/Medium.vue'
 import Hard from '../views/Hard.vue'
-import Hello from '../components/HelloWorld.vue'
+import Hello from '../views/Home.vue'
 import {  useQuizStore } from '../stores'
 
   
@@ -41,8 +41,8 @@ const router = createRouter({
 })
 var quizStore
 router.beforeEach((to, from, next) => {   
-  if (to.name !== 'login' && !useQuizStore().token) next('/login')
-  else next()
+/*  if (to.name !== 'login' && !useQuizStore().token) next('/login')
+  else*/ next()
 })
 
 export default router
